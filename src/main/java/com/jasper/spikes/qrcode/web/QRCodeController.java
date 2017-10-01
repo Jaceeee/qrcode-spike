@@ -7,6 +7,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -24,19 +25,29 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.EnumMap;
 import java.util.Map;
 
 @RestController
 public class QRCodeController {
 
-    @GetMapping("/download")
-    public ResponseEntity<Resource> downloadFile(HttpServletRequest request) {
-        String myCodeText = "http://crunchify.com/";
+    @Value("${qrcode.path}")
+    private String qrcodePath;
 
-        String filePath = request.getSession().getServletContext().getRealPath("/")+"CrunchifyQR.png";
-        int size = 250;
+    @GetMapping("/download")
+    public ResponseEntity<Resource> downloadFile() {
+        String myCodeText = "http://crunchify.com/";
+        File saveDir = new File(qrcodePath);
+        System.out.println(qrcodePath);
+        if(!saveDir.exists())
+            saveDir.mkdirs();
         String fileType = "png";
+        String filePath = qrcodePath + "/" + ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ) + ".png";
+        int size = 250;
         File myFile = new File(filePath);
         ByteArrayResource resource = null;
         Path path = Paths.get(myFile.getAbsolutePath());
