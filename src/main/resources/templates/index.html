@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      th:include="base :: page">
+    <head>
+        <title th:fragment="title">Test</title>
+    </head>
+    <body>
+        <th:block th:fragment="content">
+            <button id="generate">Generate</button>
+        </th:block>
+        <th:block th:fragment="js-block">
+            <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+            <script>
+                $('#generate').click(function(){
+                    alert('test')
+                })
+            </script>
+        </th:block>
+    </body>
+</html>

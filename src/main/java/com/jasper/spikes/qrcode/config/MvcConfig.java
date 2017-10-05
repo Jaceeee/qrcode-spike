@@ -1,23 +1,23 @@
-package com.jasper.spikes.qrcode;
+package com.jasper.spikes.qrcode.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
-@EnableWebMvc
 public class MvcConfig extends WebMvcConfigurerAdapter {
-
-    @Value("${qrcode.path}")
-    private String qrcodePath;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry
                 .addResourceHandler("/upload/**")
-                .addResourceLocations("file:" + qrcodePath);
+                .addResourceLocations("file:/tmp/uploads/qrcode/");
+    }
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/").setViewName("index");
     }
 
 }
