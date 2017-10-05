@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.imageio.ImageIO;
@@ -25,12 +26,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 @RestController
 public class QRCodeController {
@@ -38,19 +43,22 @@ public class QRCodeController {
     @Value("${qrcode.path}")
     private String qrcodePath;
 
-    @GetMapping("/download")
-    public ResponseEntity<Resource> downloadFile() {
+    @PostMapping("/generate")
+    public String downloadFile() {
         String myCodeText = "http://crunchify.com/";
         File saveDir = new File(qrcodePath);
         System.out.println(qrcodePath);
         if(!saveDir.exists())
             saveDir.mkdirs();
         String fileType = "png";
-        String filePath = qrcodePath + "/" + ZonedDateTime.now().format( DateTimeFormatter.ISO_INSTANT ) + ".png";
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH_mm_ss_SSS'Z'");
+        df.setTimeZone(tz);
+        String nowAsISO = df.format(new Date());
+        String fileName = nowAsISO + ".png";
+        String filePath = qrcodePath + "/" + fileName;
         int size = 250;
         File myFile = new File(filePath);
-        ByteArrayResource resource = null;
-        Path path = Paths.get(myFile.getAbsolutePath());
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
@@ -87,17 +95,12 @@ public class QRCodeController {
                 }
             }
             ImageIO.write(image, fileType, myFile);
-            resource = new ByteArrayResource(Files.readAllBytes(path));
         } catch (WriterException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentLength(myFile.length())
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
-                .body(resource);
+        return "http://localhost:8084/upload/"+fileName;
     }
 }
