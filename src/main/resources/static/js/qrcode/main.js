@@ -50,8 +50,7 @@ function read(a)
 function load()
 {
     initCanvas(640,480);
-    qrcode.callback = read;
-    qrcode.decode("meqrthumb.png");
+    qrcode.setWebcam('video')
 }
 
 function initCanvas(ww,hh)
@@ -95,7 +94,5 @@ function passLine(stringPixels) {
 }
 
 function captureToCanvas() {
-    flash = document.getElementById("embedflash");
-    flash.ccCapture();
-    qrcode.decode();
+    qrcode.captureToCanvas();
 }

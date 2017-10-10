@@ -27,36 +27,6 @@ qrcode.sizeOfDataLengthInfo =  [  [ 10, 9, 8, 8 ],  [ 12, 11, 16, 10 ],  [ 14, 1
 
 qrcode.callback = null;
 
-qrcode.vidSuccess = function (stream) 
-{
-    qrcode.localstream = stream;
-    if(qrcode.webkit)
-        qrcode.video.src = window.webkitURL.createObjectURL(stream);
-    else
-    if(qrcode.moz)
-    {
-        qrcode.video.mozSrcObject = stream;
-        qrcode.video.play();
-    }
-    else
-        qrcode.video.src = stream;
-    
-    qrcode.gUM=true;
-    
-    qrcode.canvas_qr2 = document.createElement('canvas');
-    qrcode.canvas_qr2.id = "qr-canvas";
-    qrcode.qrcontext2 = qrcode.canvas_qr2.getContext('2d');
-    qrcode.canvas_qr2.width = qrcode.video.videoWidth;
-    qrcode.canvas_qr2.height = qrcode.video.videoHeight;
-    setTimeout(qrcode.captureToCanvas, 500);
-}
-        
-qrcode.vidError = function(error)
-{
-    qrcode.gUM=false;
-    return;
-}
-
 qrcode.captureToCanvas = function()
 {
     if(qrcode.gUM)
@@ -69,6 +39,7 @@ qrcode.captureToCanvas = function()
             }
             else
             {
+                console.log('testt');
                 qrcode.canvas_qr2.width = qrcode.video.videoWidth;
                 qrcode.canvas_qr2.height = qrcode.video.videoHeight;
             }
@@ -90,50 +61,39 @@ qrcode.captureToCanvas = function()
 
 qrcode.setWebcam = function(videoId)
 {
-    var n=navigator;
-    qrcode.video=document.getElementById(videoId);
+    qrcode.video = document.getElementById(videoId);
+    navigator.getMedia = ( navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia ||
+        navigator.msGetUserMedia);
 
-    var options = true;
-    if(navigator.mediaDevices && navigator.mediaDevices.enumerateDevices)
-    {
-        try{
-            navigator.mediaDevices.enumerateDevices()
-            .then(function(devices) {
-              devices.forEach(function(device) {
-                console.log("deb1");
-                if (device.kind === 'videoinput') {
-                  if(device.label.toLowerCase().search("back") >-1)
-                    options=[{'sourceId': device.deviceId}] ;
-                }
-                console.log(device.kind + ": " + device.label +
-                            " id = " + device.deviceId);
-              });
-            })
-            
-        }
-        catch(e)
+    navigator.getMedia(
         {
-            console.log(e);
+            video: true,
+            audio: false
+        },
+        function(stream) {
+            if (navigator.mozGetUserMedia) {
+                qrcode.video.mozSrcObject = stream;
+            } else {
+                var vendorURL = window.URL || window.webkitURL;
+                qrcode.video.src = vendorURL.createObjectURL(stream);
+            }
+            qrcode.localstream = stream;
+            qrcode.video.play();
+            qrcode.gUM=true;
+            qrcode.canvas_qr2 = document.createElement('canvas');
+            qrcode.canvas_qr2.id = "qr-canvas";
+            qrcode.qrcontext2 = qrcode.canvas_qr2.getContext('2d');
+            qrcode.canvas_qr2.width = qrcode.video.videoWidth;
+            qrcode.canvas_qr2.height = qrcode.video.videoHeight;
+            console.log(qrcode.canvas_qr2);
+        },
+        function(err) {
+            qrcode.gUM=false;
+            console.log("An error occured! " + err);
         }
-    }
-    else{
-        console.log("no navigator.mediaDevices.enumerateDevices" );
-    }
-    
-    if(n.getUserMedia)
-        n.getUserMedia({video: options, audio: false}, qrcode.vidSuccess, qrcode.vidError);
-    else
-    if(n.webkitGetUserMedia)
-    {
-        qrcode.webkit=true;
-        n.webkitGetUserMedia({video:options, audio: false}, qrcode.vidSuccess, qrcode.vidError);
-    }
-    else
-    if(n.mozGetUserMedia)
-    {
-        qrcode.moz=true;
-        n.mozGetUserMedia({video: options, audio: false}, qrcode.vidSuccess, qrcode.vidError);
-    }
+    );
 }
 
 qrcode.decode = function(src){
