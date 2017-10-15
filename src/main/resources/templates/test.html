@@ -2,30 +2,38 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head>
         <title>QRCODE Reader</title>
-        <script type="text/javascript" th:src="@{/js/qrcode/grid.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/version.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/detector.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/formatinf.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/errorlevel.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/bitmat.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/datablock.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/bmparser.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/datamask.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/rsdecoder.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/gf256poly.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/gf256.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/decoder.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/qrcode.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/findpat.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/alignpat.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/databr.js}"></script>
-        <script type="text/javascript" th:src="@{/js/qrcode/main.js}"> </script>
+        <style th:inline="text">
+            #v{
+                width: 320px;
+                height: 240px;
+            }
+        </style>
+        <script type="text/javascript" th:src="@{/js/qrcode/qr.min.js}"></script>
+        <script type="text/javascript" th:src="@{/js/qrcode/asd.js}"></script>
     </head>
     <body th:attr="onload='load()'">
-        <div class="container">
-            <video id="video" height="640" width="480">Video stream not available.</video>
-            <button th:onclick="'captureToCanvas()'">Capture</button>
+        <div id="mainbody" style="display: inline;">
+            <table class="tsel" border="0" width="100%">
+                <tbody>
+                <tr>
+                    <td valign="top" align="center" width="50%">
+                        <table class="tsel" border="0">
+                            <tbody>
+                            <tr>
+                                <td colspan="2" align="center">
+                                    <div id="outdiv"><video id="v" autoplay=""></video></div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr><td colspan="3" align="center">
+                    <div id="result">- scanning -</div>
+                </td></tr>
+                </tbody>
+            </table>
         </div>
-        <canvas id="qr-canvas" width="640" height="480"></canvas>
+        <canvas id="qr-canvas" width="800" height="600" style="width: 800px; height: 600px; display: none"></canvas>
     </body>
 </html>
